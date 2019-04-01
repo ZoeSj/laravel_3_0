@@ -8,9 +8,6 @@
 
 namespace System;
 
-
-use http\Env\Response;
-
 class Error
 {
     /**

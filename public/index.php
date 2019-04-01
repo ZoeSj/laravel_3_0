@@ -51,3 +51,30 @@ error_reporting(System\config::get('error.detail')) ? E_ALL | E_STRICT : 0;
 set_exception_handler(function ($e) {
     System\Error::handle($e);
 });
+
+set_error_handler(function ($number, $error, $file, $line) {
+    System\Error::handle(new ErrorException($error, 0, $number, $file, $line));
+});
+
+register_shutdown_function(function () {
+    if (!is_null($error = error_get_last())) {
+        System\Error::handle(new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']));
+    }
+});
+
+/**
+ * set the default timezone
+ */
+date_default_timezone_set(System\Config::get('application.timezone'));
+
+/**
+ * load the session
+ */
+if (System\Config::get('session.driver') != '') {
+    System\Session::load();
+}
+
+/**
+ * execute the global "before" filter
+ */
+$response = '';
